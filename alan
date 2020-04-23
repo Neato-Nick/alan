@@ -75,8 +75,18 @@ INFILE=${1:-/dev/stdin}
 
 # Check the input file is specified and present or stdin is open
 if [[ ! -f $INFILE || "$INFILE" == "" ]]; then
-	if [[ ! -t 0 ]]; then
+	if [[ -p /dev/stdin ]]; then
 		echo "Read from stdin"
+		# right now only solution I can find is writing to a temp file
+		# doesnt solve file space issue, but at least simple for end-user
+		# https://stackoverflow.com/questions/19408649/pipe-input-into-a-script
+		rm -f tmp.alan.seqs
+		cat >> tmp.alan.seqs
+		INFILE=tmp.alan.seqs
+		# INFILE=$(cat tmp.alan.seqs)
+		# rm -f tmp.alan.seqs
+		#INFILE=tmp.alan.seqs
+		# INFILE=$( cat )
 	else
 		echo "Error: Please specify a valid input file! :)"
 		exit; fi
